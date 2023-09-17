@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <!--Import materialize.css-->
+    <link type="text/css" rel="stylesheet" href="materialize/css/materialize.min.css"  media="screen,projection"/>
+    <!--Let browser know website is optimized for mobile-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>bj</title>
+</head>
+<body style="width: 500px;height: 640px;padding: 10px;">
+    <div class="container">
+    <h5 style="text-align: center;">투표 입력하기</h5>
+    <form id="candidate-form">
+        <div id="canidate-div">
+            <div class="input-field">
+                <label for="candidate-name1">후보1</label>
+                <input type="text" id="candidate-name1" class="candidate" required>
+            </div>
+            <div class="input-field">
+                <label for="candidate-name2">후보2</label>
+                <input type="text" id="candidate-name2" class="candidate">
+            </div>
+            <div class="input-field">
+                <label for="candidate-name3">후보3</label>
+                <input type="text" id="candidate-name3" class="candidate">
+            </div>
+            <div class="input-field">
+                <label for="candidate-name4">후보4</label>
+                <input type="text" id="candidate-name4" class="candidate">
+            </div>
+            <div class="input-field">
+                <label for="candidate-name5">후보5</label>
+                <input type="text" id="candidate-name5" class="candidate">
+            </div>
+        </div>
+        <p style="text-align: center;">
+            <a id="add-candidate" class="btn-floating btn-small waves-effect waves-light grey lighten-1"><b>&#43;</b></a>
+        </p>
+        <div class="input-field">
+            <span>타이머</span><input type="number" id="timer" min="1" max="86400" style="width: 100px; text-align: center;">분<span id="trans-time" style="margin-left: 10px;color: limegreen;"></span><br>
+            <a data-time="1" class="add-time waves-effect waves-light btn-small green lighten-1">+1분</a>
+            <a data-time="5" class="add-time waves-effect waves-light btn-small green lighten-1">+5분</a>
+            <a data-time="10" class="add-time waves-effect waves-light btn-small green lighten-1">+10분</a>
+        </div>
+        <!-- <div class="input-field">
+            <label for="file-input">후보 이미지 URL</label>
+            <input type="file" id="file-input" multiple />
+            <div id="preview"></div>
+        </div> -->
+        <div style="text-align: center;">
+            <button class="btn-large waves-effect waves-light orange lighten-1" type="submit">등록하기</button>
+        </div>
+    </form>
+    </div>
+    <!--JavaScript at end of body for optimized loading-->
+    <script type="text/javascript" src="materialize/js/materialize.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Initialize Materialize form components
+            M.AutoInit();
+
+            let candidateIdx = 5;
+
+            // Handle form submission
+            document.getElementById('candidate-form').addEventListener('submit', function (event) {
+                event.preventDefault();
+
+                const candidates = document.querySelectorAll(".candidate");
+                const timer = document.querySelector("#timer");
+
+                console.log(candidates)
+
+                for (const candidate of candidates) {
+                    console.log(candidate.value)
+                }
+                console.log(timer, timer.value)
+
+                // Get candidate name and image URL from the form
+                // const candidateName = document.getElementById('candidate-name').value;
+                // const candidateImageUrl = document.getElementById('candidate-image-url').value;
+
+                // You can send this data to your server for further processing
+                // Example:
+                // fetch('/submit-candidate', {
+                //     method: 'POST',
+                //     body: JSON.stringify({ name: candidateName, imageUrl: candidateImageUrl }),
+                //     headers: {
+                //         'Content-Type': 'application/json'
+                //     }
+                // })
+                // .then(response => {
+                //     // Handle the server response here
+                // });
+
+                // For this example, we'll just display an alert
+                // alert(`후보 이름: ${candidateName}\n후보 이미지 URL: ${candidateImageUrl}`);
+            });
+
+            document.getElementById('add-candidate').addEventListener("click", function(e) {
+                candidateIdx += 1;
+                let candidateDiv = document.getElementById('canidate-div');
+                const addDiv = `<div class="input-field">
+                    <label for="candidate-name${candidateIdx}">후보${candidateIdx}</label>
+                    <input type="text" id="candidate-name${candidateIdx}" class="candidate">
+                </div>`;
+
+                candidateDiv.insertAdjacentHTML('beforeend', addDiv);
+            });
+
+            document.getElementById('timer').addEventListener("change", function(e) {
+                this.value = this.value.replace(/[^0-9]/g,'');
+                const inputTime = e.target.value;
+
+                console.log('?')
+                if (inputTime > 60) {
+                    let transSpan = document.getElementById('trans-time');
+
+                    const h = Math.floor(inputTime / 60);
+                    const m = inputTime % 60;
+
+                    // 시와 분을 문자열로 표시
+                    const transTime = `${h}시간 ${m}분`;
+                    transSpan.innerText = transTime;
+                }
+                else if (inputTime > 1400) {
+                    alert('1일 이상 타이머 지정이 불가합니다.');
+                    this.value = 1400;
+                }
+            });
+
+
+            let addTimeElAll = document.querySelectorAll('.add-time');
+            addTimeElAll.forEach((target) => target.addEventListener("click", function(e){ 
+                    const addTime = target.dataset.time;
+                    const timerEl = document.getElementById('timer');
+
+                    timerEl.value = Number(timerEl.value) + Number(addTime);
+
+                    // change event trigger
+                    document.getElementById('timer').dispatchEvent(new Event('change'));
+                })
+            );
+        });
+    </script>
+</body>
+</html>
