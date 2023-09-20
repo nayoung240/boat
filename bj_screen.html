@@ -8,103 +8,115 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>bj</title>
 </head>
+<style>
+    .loader {
+        width: 40px;
+        height: 40px;
+        display: block;
+        margin: 40px auto;
+        position: relative;
+        border: 3px solid #60c6bd;
+        border-radius: 50%;
+        box-sizing: border-box;
+        animation: animloader 2s linear infinite;   
+    }
+    .loader::after {
+        content: '';  
+        box-sizing: border-box;
+        width: 6px;
+        height: 24px;
+        background: #60c6bd;
+        transform: rotate(-45deg);
+        position: absolute;
+        bottom: -20px;
+        left: 40px;
+    }
+
+    @keyframes animloader {
+        0% {
+            transform: translate(-10px, -10px);
+        }
+        25% {
+            transform: translate(-10px, 10px);
+        }
+        50% {
+            transform: translate(10px, 10px);
+        }
+        75% {
+            transform: translate(10px, -10px);
+        }
+        100% {
+            transform: translate(-10px, -10px);
+        }
+    }
+
+    .add-time {
+        border-radius: 20px;
+    }
+</style>
 <body style="width: 500px;height: 640px;padding: 10px;">
     <div class="container">
-    <h5 style="text-align: center;">투표 입력하기</h5>
-    <form id="candidate-form">
-        <div id="canidate-div">
-            <div class="input-field">
-                <label for="candidate-name1">후보1</label>
-                <input type="text" id="candidate-name1" class="candidate" required>
+        <span class="loader"></span>
+        <p style="text-align: center;"><b><span id="bjnick"></span>님! 몇분동안 민심을 파악하실건가요?</b></p>
+        <form id="candidate-form">
+            <div style="text-align: center;">
+                <a data-time="1" class="add-time waves-effect waves-light btn-small cyan darken-1">+1분</a>
+                <a data-time="5" class="add-time waves-effect waves-light btn-small cyan darken-1">+5분</a>
+                <a data-time="10" class="add-time waves-effect waves-light btn-small cyan darken-1">+10분</a>
+                <a data-time="30" class="add-time waves-effect waves-light btn-small cyan darken-1">+30분</a>
             </div>
-            <div class="input-field">
-                <label for="candidate-name2">후보2</label>
-                <input type="text" id="candidate-name2" class="candidate">
+            <div class="input-field" style="text-align: center;">
+                <input type="number" id="timer" min="1" max="86400" style="width: 100px; text-align: center;">분<span id="trans-time" style="margin-left: 10px;color: darkturquoise;"></span>
+                <button class="btn-large btn-floating waves-effect waves-light cyan darken-4" type="submit">Start!</button>
+            </div><br>
+            <div style="text-align: center;">
             </div>
-            <div class="input-field">
-                <label for="candidate-name3">후보3</label>
-                <input type="text" id="candidate-name3" class="candidate">
-            </div>
-            <div class="input-field">
-                <label for="candidate-name4">후보4</label>
-                <input type="text" id="candidate-name4" class="candidate">
-            </div>
-            <div class="input-field">
-                <label for="candidate-name5">후보5</label>
-                <input type="text" id="candidate-name5" class="candidate">
-            </div>
-        </div>
-        <p style="text-align: center;">
-            <a id="add-candidate" class="btn-floating btn-small waves-effect waves-light grey lighten-1"><b>&#43;</b></a>
-        </p>
-        <div class="input-field">
-            <span>타이머</span><input type="number" id="timer" min="1" max="86400" style="width: 100px; text-align: center;">분<span id="trans-time" style="margin-left: 10px;color: limegreen;"></span><br>
-            <a data-time="1" class="add-time waves-effect waves-light btn-small green lighten-1">+1분</a>
-            <a data-time="5" class="add-time waves-effect waves-light btn-small green lighten-1">+5분</a>
-            <a data-time="10" class="add-time waves-effect waves-light btn-small green lighten-1">+10분</a>
-        </div>
-        <div style="text-align: center;">
-            <button class="btn-large waves-effect waves-light orange lighten-1" type="submit">등록하기</button>
-        </div>
-    </form>
+        </form>
     </div>
     <!--JavaScript at end of body for optimized loading-->
-    <script src="https://static.afreecatv.com/asset/app/extension-helper/afreecatv-extension-sdk.js"></script>
+    <script type="text/javascript" src="https://static.afreecatv.com/asset/app/extension-helper/afreecatv-extension-sdk.js"></script>
     <script type="text/javascript" src="materialize/js/materialize.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             // Initialize Materialize form components
             M.AutoInit();
 
-            let candidateIdx = 5;
-
             const SDK = window.AFREECA.ext;
             const extensionSdk = SDK();
-            const userList = [];
 
-            const handleBroadcastReceived = (action, message, fromId) => {
-                // 사다리 게임 참여자 등록 
-                if(action === 'join-ladder-game'){
-                        // TODO : 참여자 중복 체크 
-                        userList.push({
-                            userId : fromId, 
-                        });
-                }
+            let isLoggedIn = false;
+            let isBJ = false;
+            let broadInfo = null; // 방송 정보
+            let playerInfo = null; // 플레이어 상태 정보
+
+            const init =(auth, broad, player)=>{
+                isLoggedIn = !!auth.obscureUserId;
+                isBJ = auth.isBJ;
+
+                broadInfo = broad;
+                playerInfo = player;
+
+                document.getElementById('bjnick').innerText = broadInfo.bjNickname;
+            
+                renderError("로그인을 해주세요.");
             }
 
-            extensionSdk.broadcast.listen(handleBroadcastReceived);
+            extensionSdk.handleInitialization(init);
+
+ 
 
             // Handle form submission
             document.getElementById('candidate-form').addEventListener('submit', function (event) {
                 event.preventDefault();
-
-                const candidates = document.querySelectorAll(".candidate");
                 const timer = document.querySelector("#timer");
-
-                console.log(candidates)
-
-                for (const candidate of candidates) {
-                    console.log(candidate.value)
-                }
-                console.log(timer, timer.value)
-            });
-
-            document.getElementById('add-candidate').addEventListener("click", function(e) {
-                candidateIdx += 1;
-                let candidateDiv = document.getElementById('canidate-div');
-                const addDiv = `<div class="input-field">
-                    <label for="candidate-name${candidateIdx}">후보${candidateIdx}</label>
-                    <input type="text" id="candidate-name${candidateIdx}" class="candidate">
-                </div>`;
-
-                candidateDiv.insertAdjacentHTML('beforeend', addDiv);
+                console.log(timer.value)
             });
 
             document.getElementById('timer').addEventListener("change", function(e) {
                 this.value = this.value.replace(/[^0-9]/g,'');
                 const inputTime = e.target.value;
 
-                console.log('?')
+                console.log('타이머 추가')
                 if (inputTime > 60) {
                     let transSpan = document.getElementById('trans-time');
 
