@@ -43,17 +43,13 @@
             <a data-time="5" class="add-time waves-effect waves-light btn-small green lighten-1">+5분</a>
             <a data-time="10" class="add-time waves-effect waves-light btn-small green lighten-1">+10분</a>
         </div>
-        <!-- <div class="input-field">
-            <label for="file-input">후보 이미지 URL</label>
-            <input type="file" id="file-input" multiple />
-            <div id="preview"></div>
-        </div> -->
         <div style="text-align: center;">
             <button class="btn-large waves-effect waves-light orange lighten-1" type="submit">등록하기</button>
         </div>
     </form>
     </div>
     <!--JavaScript at end of body for optimized loading-->
+    <script src="https://static.afreecatv.com/asset/app/extension-helper/afreecatv-extension-sdk.js"></script>
     <script type="text/javascript" src="materialize/js/materialize.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
@@ -61,6 +57,22 @@
             M.AutoInit();
 
             let candidateIdx = 5;
+
+            const SDK = window.AFREECA.ext;
+            const extensionSdk = SDK();
+            const userList = [];
+
+            const handleBroadcastReceived = (action, message, fromId) => {
+                // 사다리 게임 참여자 등록 
+                if(action === 'join-ladder-game'){
+                        // TODO : 참여자 중복 체크 
+                        userList.push({
+                            userId : fromId, 
+                        });
+                }
+            }
+
+            extensionSdk.broadcast.listen(handleBroadcastReceived);
 
             // Handle form submission
             document.getElementById('candidate-form').addEventListener('submit', function (event) {
@@ -75,26 +87,6 @@
                     console.log(candidate.value)
                 }
                 console.log(timer, timer.value)
-
-                // Get candidate name and image URL from the form
-                // const candidateName = document.getElementById('candidate-name').value;
-                // const candidateImageUrl = document.getElementById('candidate-image-url').value;
-
-                // You can send this data to your server for further processing
-                // Example:
-                // fetch('/submit-candidate', {
-                //     method: 'POST',
-                //     body: JSON.stringify({ name: candidateName, imageUrl: candidateImageUrl }),
-                //     headers: {
-                //         'Content-Type': 'application/json'
-                //     }
-                // })
-                // .then(response => {
-                //     // Handle the server response here
-                // });
-
-                // For this example, we'll just display an alert
-                // alert(`후보 이름: ${candidateName}\n후보 이미지 URL: ${candidateImageUrl}`);
             });
 
             document.getElementById('add-candidate').addEventListener("click", function(e) {
@@ -128,7 +120,6 @@
                     this.value = 1400;
                 }
             });
-
 
             let addTimeElAll = document.querySelectorAll('.add-time');
             addTimeElAll.forEach((target) => target.addEventListener("click", function(e){ 
