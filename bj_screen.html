@@ -9,56 +9,92 @@
     <title>bj</title>
 </head>
 <style>
-    .loader {
-        width: 40px;
-        height: 40px;
-        display: block;
-        margin: 40px auto;
-        position: relative;
-        border: 3px solid #60c6bd;
-        border-radius: 50%;
-        box-sizing: border-box;
-        animation: animloader 2s linear infinite;   
-    }
-    .loader::after {
-        content: '';  
-        box-sizing: border-box;
-        width: 6px;
-        height: 24px;
-        background: #60c6bd;
-        transform: rotate(-45deg);
-        position: absolute;
-        bottom: -20px;
-        left: 40px;
-    }
-
-    @keyframes animloader {
-        0% {
-            transform: translate(-10px, -10px);
-        }
-        25% {
-            transform: translate(-10px, 10px);
-        }
-        50% {
-            transform: translate(10px, 10px);
-        }
-        75% {
-            transform: translate(10px, -10px);
-        }
-        100% {
-            transform: translate(-10px, -10px);
-        }
-    }
-
     .add-time {
         border-radius: 20px;
     }
+
+    p {
+        font-size: 15px;
+    }
+
+    #limit-time {
+        position: relative;
+        top: 10px;
+        display: inline-block;
+        animation: bounce .5s ease infinite alternate;
+        font-family : fantasy; 
+        font-size: 35px;
+        color: #009688;
+        text-shadow: 0 1px 0 #CCC,
+                    0 2px 0 #CCC,
+                    0 3px 0 #CCC,
+                    0 4px 0 #CCC,
+                    0 5px 0 #CCC,
+                    0 6px 0 transparent,
+                    0 7px 0 transparent,
+                    0 8px 0 transparent,
+                    0 9px 0 transparent,
+                    0 10px 10px rgba(0, 0, 0, .4);
+    }
+
+    @keyframes bounce {
+        100% {
+            top: -5px;
+            text-shadow: 0 1px 0 #CCC,
+                        0 2px 0 #CCC,
+                        0 3px 0 #CCC,
+                        0 4px 0 #CCC,
+                        0 5px 0 #CCC,
+                        0 6px 0 #CCC,
+                        0 7px 0 #CCC,
+                        0 8px 0 #CCC,
+                        0 9px 0 #CCC,
+                        0 50px 25px rgba(0, 0, 0, .2);
+        }
+    }
+
+    #submit-btn {
+        animation: fadein 3s;
+    }
+
+    @keyframes fadein {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+
+    .wrapper {
+        display: grid;
+        place-items: center;
+        text-align: center;
+    }
+
+    #sub-title {
+        overflow: hidden; /* Ensures the content is not revealed until the animation */
+        white-space: nowrap; /* Keeps the content on a single line */
+        animation: 
+        typing 3s steps(40, end),
+        blink-caret .75s step-end infinite;
+    }
+
+    @keyframes typing {
+        from { width: 0 }
+        to { width: 100% }
+    }
 </style>
-<body style="width: 500px;height: 640px;padding: 10px;">
+<body style="background-color: #fcfcfc;">
     <div class="container">
-        <span class="loader"></span>
-        <p style="text-align: center;"><b><span id="bjnick"></span>님! 몇분동안 민심을 파악하실건가요?</b></p>
+        <div style="text-align: center;">
+            <img src="heartbeat.gif" alt="hearbeat" style="width:140px;height:120px;">
+        </div>
         <form id="candidate-form">
+            <div class="wrapper">
+                <b><span id="bjnick">BJ</span>님!</b>
+                <p id="sub-title"><b>몇분동안 민심을 파악하실건가요?</b></p>
+            </div>
             <div style="text-align: center;">
                 <a data-time="1" class="add-time waves-effect waves-light btn-small cyan darken-1">+1분</a>
                 <a data-time="5" class="add-time waves-effect waves-light btn-small cyan darken-1">+5분</a>
@@ -67,84 +103,36 @@
             </div>
             <div class="input-field" style="text-align: center;">
                 <input type="number" id="timer" min="1" max="86400" style="width: 100px; text-align: center;">분<span id="trans-time" style="margin-left: 10px;color: darkturquoise;"></span>
-                <button class="btn-large btn-floating waves-effect waves-light cyan darken-4" type="submit">Start!</button>
-            </div><br>
-            <div style="text-align: center;">
             </div>
         </form>
+        <div style="text-align: center;">
+            <button id="submit-btn" class="btn-large btn-floating waves-effect waves-light cyan darken-3" data-status="start">Start!</button>
+        </div>
+        <br>
+        <div style="text-align: center;">
+            <span id="limit-time"></span>
+        </div>
+        <div id="userGrade" style="text-align: center; display: none;">
+            <p><b>유저별로 상위 민심 키워드를 살펴보세요!</b></p>
+            <form>
+                <label><input data-grade="all" name="ugroup" type="radio" checked/><span>전체</span></label>
+                <label><input data-grade="topfan" name="ugroup" type="radio"/><span>열혈팬</span></label>
+                <label><input data-grade="allfan" name="ugroup" type="radio"/><span>매니저,팬,구독자,서포터</span></label>
+                <label><input data-grade="nofan" name="ugroup" type="radio"/><span>일반</span></label>
+            </form>
+        </div>
+        <br>
+        <div style="text-align: center;">
+            <div id="emptyResult" style="display: none;">
+                <img src="noresult.png" alt="noresult" style="width:140px;height:120px;">
+                <p><b>민심이 없어요.. 그냥 없어요...</b></p>
+            </div>
+            <table id="resultTbl" style="display: none; text-align: center;"></table>
+        </div>
     </div>
     <!--JavaScript at end of body for optimized loading-->
     <script type="text/javascript" src="https://static.afreecatv.com/asset/app/extension-helper/afreecatv-extension-sdk.js"></script>
     <script type="text/javascript" src="materialize/js/materialize.min.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // Initialize Materialize form components
-            M.AutoInit();
-
-            const SDK = window.AFREECA.ext;
-            const extensionSdk = SDK();
-
-            let isLoggedIn = false;
-            let isBJ = false;
-            let broadInfo = null; // 방송 정보
-            let playerInfo = null; // 플레이어 상태 정보
-
-            const init =(auth, broad, player)=>{
-                isLoggedIn = !!auth.obscureUserId;
-                isBJ = auth.isBJ;
-
-                broadInfo = broad;
-                playerInfo = player;
-
-                document.getElementById('bjnick').innerText = broadInfo.bjNickname;
-            
-                renderError("로그인을 해주세요.");
-            }
-
-            extensionSdk.handleInitialization(init);
-
- 
-
-            // Handle form submission
-            document.getElementById('candidate-form').addEventListener('submit', function (event) {
-                event.preventDefault();
-                const timer = document.querySelector("#timer");
-                console.log(timer.value)
-            });
-
-            document.getElementById('timer').addEventListener("change", function(e) {
-                this.value = this.value.replace(/[^0-9]/g,'');
-                const inputTime = e.target.value;
-
-                console.log('타이머 추가')
-                if (inputTime > 60) {
-                    let transSpan = document.getElementById('trans-time');
-
-                    const h = Math.floor(inputTime / 60);
-                    const m = inputTime % 60;
-
-                    // 시와 분을 문자열로 표시
-                    const transTime = `${h}시간 ${m}분`;
-                    transSpan.innerText = transTime;
-                }
-                else if (inputTime > 1400) {
-                    alert('1일 이상 타이머 지정이 불가합니다.');
-                    this.value = 1400;
-                }
-            });
-
-            let addTimeElAll = document.querySelectorAll('.add-time');
-            addTimeElAll.forEach((target) => target.addEventListener("click", function(e){ 
-                    const addTime = target.dataset.time;
-                    const timerEl = document.getElementById('timer');
-
-                    timerEl.value = Number(timerEl.value) + Number(addTime);
-
-                    // change event trigger
-                    document.getElementById('timer').dispatchEvent(new Event('change'));
-                })
-            );
-        });
-    </script>
+    <script type="text/javascript" src="bj_screen.js"></script>
 </body>
 </html>
