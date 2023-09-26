@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <!--Import materialize.css-->
-    <link type="text/css" rel="stylesheet" href="materialize/css/materialize.min.css"  media="screen,projection"/>
+    <link type="text/css" rel="stylesheet" href="./materialize.min.css" media="screen,projection"/>
     <!--Let browser know website is optimized for mobile-->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>bj</title>
+    <title>minsimchecker</title>
 </head>
 <style>
     .add-time {
@@ -97,9 +97,9 @@
             </div>
             <div style="text-align: center;">
                 <a data-time="1" class="add-time waves-effect waves-light btn-small cyan darken-1">+1분</a>
-                <a data-time="5" class="add-time waves-effect waves-light btn-small cyan darken-1">+5분</a>
                 <a data-time="10" class="add-time waves-effect waves-light btn-small cyan darken-1">+10분</a>
                 <a data-time="30" class="add-time waves-effect waves-light btn-small cyan darken-1">+30분</a>
+                <a data-time="60" class="add-time waves-effect waves-light btn-small cyan darken-1">+1시간</a>
             </div>
             <div class="input-field" style="text-align: center;">
                 <input type="number" id="timer" min="1" max="86400" style="width: 100px; text-align: center;">분<span id="trans-time" style="margin-left: 10px;color: darkturquoise;"></span>
@@ -108,10 +108,11 @@
         <div style="text-align: center;">
             <button id="submit-btn" class="btn-large btn-floating waves-effect waves-light cyan darken-3" data-status="start">Start!</button>
         </div>
-        <br>
         <div style="text-align: center;">
             <span id="limit-time"></span>
         </div>
+        <a id="chatReset" style="float: right; display: none; background-color: #fcfcfc;" class="waves-effect waves-light btn-flat"><img src="delete_icon.png" alt="delete"></a>
+        <br>
         <div id="userGrade" style="text-align: center; display: none;">
             <p><b>유저별로 상위 민심 키워드를 살펴보세요!</b></p>
             <form>
@@ -132,7 +133,7 @@
     </div>
     <!--JavaScript at end of body for optimized loading-->
     <script type="text/javascript" src="https://static.afreecatv.com/asset/app/extension-helper/afreecatv-extension-sdk.js"></script>
-    <script type="text/javascript" src="materialize/js/materialize.min.js"></script>
-    <script type="text/javascript" src="bj_screen.js"></script>
+    <script type="text/javascript" src="./materialize.min.js"></script>
+    <script type="text/javascript" src="./bj_screen.js"></script>
 </body>
 </html>

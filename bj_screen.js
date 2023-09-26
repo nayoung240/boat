@@ -5,10 +5,10 @@ document.addEventListener('DOMContentLoaded', function () {
     const SDK = window.AFREECA.ext;
     const extensionSdk = SDK();
 
-    const group1wordCount = {};
-    const group2wordCount = {};
-    const group3wordCount = {};
-    const totalwordCount = {};
+    let group1wordCount = {};
+    let group2wordCount = {};
+    let group3wordCount = {};
+    let totalwordCount = {};
 
     let isLoggedIn = false;
     let isBJ = false;
@@ -155,6 +155,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 setIntervaltimer = null;
                 document.getElementById('submit-btn').innerText = 'Retry!';
                 document.getElementById('userGrade').style.display = 'block'; 
+                document.getElementById('chatReset').style.display = 'none';
                 M.toast({html: `${minutes} 분 경과로 종료합니다`});
                 return;
             } 
@@ -203,11 +204,11 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
-        let transSpan = document.getElementById('trans-time');
         e.target.dataset.status = 'stop';
         e.target.innerText = 'STOP!';
-        transSpan.innerText = '';
+        document.getElementById('trans-time').innerText = '';
         candidateForm.style.display = 'none';
+        document.getElementById('chatReset').style.display = 'block';
 
         M.toast({html: '시작합니다!'})
 
@@ -250,6 +251,15 @@ document.addEventListener('DOMContentLoaded', function () {
         // change event trigger
         document.getElementById('timer').dispatchEvent(new Event('change'));
     }));
+
+    // 채팅 초기화 버튼
+    document.getElementById('chatReset').addEventListener('click', function (e) {
+        group1wordCount = {};
+        group2wordCount = {};
+        group3wordCount = {};
+        totalwordCount = {};
+        document.getElementById('resultTbl').innerHTML = ''; // 초기화
+    });
 
     // 유저타입 선택 라디오 버튼
     let ugroupElAll = document.querySelectorAll('input[name=ugroup]');
