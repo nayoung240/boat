@@ -5,16 +5,13 @@ document.addEventListener('DOMContentLoaded', function () {
     const SDK = window.AFREECA.ext;
     const extensionSdk = SDK();
 
-    let group1wordCount = {};
-    let group2wordCount = {};
-    let group3wordCount = {};
-    let totalwordCount = {};
-
     let isLoggedIn = false;
     let isBJ = false;
     let broadInfo = null; // 방송 정보
     let playerInfo = null; // 플레이어 상태 정보
     let setIntervaltimer;
+
+    let wordCounts = {};
 
     const init =(auth, broad, player)=>{
         isLoggedIn = !!auth.obscureUserId;
@@ -49,22 +46,22 @@ document.addEventListener('DOMContentLoaded', function () {
                 // 빈채팅 제거
                 if(!chat) return;
 
-                // 그룹1 isTopFan 
-                if(userInfo.isTopFan) {
-                    group1wordCount[chat] ? group1wordCount[chat] += 1 : group1wordCount[chat] = 1;
-                    totalwordCount[chat] ? totalwordCount[chat] += 1 : totalwordCount[chat] = 1;
+                if (!wordCounts[chat]) {
+                    wordCounts[chat] = { total: 0, group1: 0, group2: 0, group3: 0 };
                 }
-                // 그룹2 isManager isFan isFollower isSupporter 
-                else if(userInfo.isManager || userInfo.isFan || userInfo.isFollower || userInfo.isSupporter) {
-                    group2wordCount[chat] ? group2wordCount[chat] += 1 : group2wordCount[chat] = 1;
-                    totalwordCount[chat] ? totalwordCount[chat] += 1 : totalwordCount[chat] = 1;
+
+                // 전체 카운트 증가
+                wordCounts[chat].total += 1;
+
+                // 그룹별 카운트
+                if (userInfo.isTopFan) {
+                    wordCounts[chat].group1 += 1;
+                } else if (userInfo.isManager || userInfo.isFan || userInfo.isFollower || userInfo.isSupporter) {
+                    wordCounts[chat].group2 += 1;
+                } else {
+                    wordCounts[chat].group3 += 1;
                 }
-                // 그룹3 그외 (isBJ 제외)
-                else {
-                    group3wordCount[chat] ? group3wordCount[chat] += 1 : group3wordCount[chat] = 1;
-                    totalwordCount[chat] ? totalwordCount[chat] += 1 : totalwordCount[chat] = 1;
-                }
-                // console.log(totalwordCount)
+
                 break;
             default:
                 break;
@@ -77,65 +74,52 @@ document.addEventListener('DOMContentLoaded', function () {
     const showResult = (type) => {
         const resultTblEl = document.getElementById('resultTbl'); 
         const emptyResultEl = document.getElementById('emptyResult'); 
-        let trEl = '';
+        const bannerEl = document.getElementById("banner");
+
+        let filteredCounts = {};
 
         // 데이터가 없으면 종료
-        if(Object.keys(totalwordCount).length === 0) {
+        if(Object.keys(wordCounts).length === 0) {
             // console.log('empty');
             emptyResultEl.style.display = 'block';
             return;
         }
 
-        let showCount = {};
+        document.getElementById('chatReset').style.display = 'block'; // 지우기버튼 노출
 
         switch (type) {
-            case 'all': // 전체
+            case 'topfan':
+                filteredCounts = Object.fromEntries(Object.entries(wordCounts).map(([key, value]) => [key, value.group1]));
+                break;
+            case 'allfan':
+                filteredCounts = Object.fromEntries(Object.entries(wordCounts).map(([key, value]) => [key, value.group2]));
+                break;
+            case 'nofan':
+                filteredCounts = Object.fromEntries(Object.entries(wordCounts).map(([key, value]) => [key, value.group3]));
+                break;
+            case 'all':
             default:
-                showCount = totalwordCount;
-                break;
-            case 'topfan': // 열혈팬
-                showCount = group1wordCount;
-                break;
-            case 'allfan': // 그외팬
-                showCount = group2wordCount;
-                break;
-            case 'nofan': // 일반
-                showCount = group3wordCount;
+                filteredCounts = Object.fromEntries(Object.entries(wordCounts).map(([key, value]) => [key, value.total]));
                 break;
         }
 
-        emptyResultEl.style.display = 'none';
-        resultTblEl.innerHTML = ''; // 초기화
+        // 필터링된 데이터를 정렬하여 출력
+        const sortedEntries = Object.entries(filteredCounts).sort((a, b) => b[1] - a[1]).slice(0, 10);
+        resultTblEl.innerHTML = '<tr><th>민심 키워드</th><th>민심도</th></tr>';
 
-        // 객체를 배열로 변환하고 값에 따라 정렬
-        const sortedEntries = Object.entries(showCount).sort((a, b) => b[1] - a[1]);
-        const topEntries = sortedEntries.slice(0, 10); // 10위까지
-        let rank = 1;
+        sortedEntries.forEach(([key, value], rank) => {
+            let rowColor = '';
+            if (rank === 0) rowColor = 'style="background-color: #e57373;"';
+            if (rank === 1) rowColor = 'style="background-color: #ffa726;"';
+            if (rank === 2) rowColor = 'style="background-color: #ffe082;"';
 
-        trEl = '<tr><th>키워드</th><th>민심도</th></tr>';
-
-        topEntries.forEach(([key, value]) => {
-            switch (rank) {
-                case 1:
-                    trEl += '<tr style="background-color: #fcd5e2;">';
-                    break;
-                case 2:
-                    trEl += '<tr style="background-color: #fce4ec;">';
-                    break;
-                case 3:
-                    trEl += '<tr style="background-color: #fef3f6;">';
-                    break;
-            }
-   
-            trEl += `<td><b>${key}</b></td><td>${value}</td>
-                    </tr>`;
-
-            rank += 1;
+            resultTblEl.insertAdjacentHTML('beforeend', `<tr ${rowColor}><td><b>${key}</b></td><td><b>${value}</b></td></tr>`);
         });
 
-        resultTblEl.insertAdjacentHTML('beforeend', trEl);
-
         resultTblEl.style.display = 'table';
+        emptyResultEl.style.display = 'none';
+
+        bannerEl.style.display = 'inline';
     }
 
     const startTimer = (action, minutes) => {
@@ -153,9 +137,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 clearInterval(setIntervaltimer); 
                 limitTime.innerText = '';
                 setIntervaltimer = null;
-                document.getElementById('submit-btn').innerText = 'Retry!';
+                // document.getElementById('submit-btn').innerText = '다시!';
                 document.getElementById('userGrade').style.display = 'block'; 
-                document.getElementById('chatReset').style.display = 'none';
+                document.getElementById('chatReset').style.display = 'none'; // 지우기 버튼 비노출
                 M.toast({html: `${minutes} 분 경과로 종료합니다`});
                 return;
             } 
@@ -187,9 +171,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Start or Stop
     document.getElementById('submit-btn').addEventListener('click', function (e) {
-        event.preventDefault();
+        e.preventDefault();
         const timer = document.getElementById("timer");
         const candidateForm = document.getElementById("candidate-form");
+        const bannerEl = document.getElementById("banner");
         const btnStatus = e.target.dataset.status;
         const settingTime = Number(timer.value);
 
@@ -205,10 +190,15 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         e.target.dataset.status = 'stop';
-        e.target.innerText = 'STOP!';
+        e.target.src = 'img/replay.png';
         document.getElementById('trans-time').innerText = '';
         candidateForm.style.display = 'none';
-        document.getElementById('chatReset').style.display = 'block';
+
+        const banners = ["banner2.webp", "banner3.webp", "banner4.webp", "banner5.webp", "banner6.webp", "banner7.webp"];
+        const selectedBanner = banners[Math.floor(Math.random() * banners.length)];
+
+        bannerEl.src = '/img/' + selectedBanner;
+        bannerEl.style.display = 'none';
 
         M.toast({html: '시작합니다!'})
 
@@ -254,10 +244,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // 채팅 초기화 버튼
     document.getElementById('chatReset').addEventListener('click', function (e) {
-        group1wordCount = {};
-        group2wordCount = {};
-        group3wordCount = {};
-        totalwordCount = {};
+        wordCounts = {};
         document.getElementById('resultTbl').innerHTML = ''; // 초기화
     });
 

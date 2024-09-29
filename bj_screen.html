@@ -24,7 +24,7 @@
         animation: bounce .5s ease infinite alternate;
         font-family : fantasy; 
         font-size: 35px;
-        color: #009688;
+        color: #006726;
         text-shadow: 0 1px 0 #CCC,
                     0 2px 0 #CCC,
                     0 3px 0 #CCC,
@@ -88,33 +88,36 @@
 <body style="background-color: #fcfcfc;">
     <div class="container">
         <div style="text-align: center;">
-            <img src="./heartbeat.gif" alt="hearbeat" style="width:140px;height:120px;">
+            <img id="banner" src="img/banner1.webp" alt="random banner" style="width:180px;margin-top: 30px;">
         </div>
         <form id="candidate-form">
             <div class="wrapper">
-                <b><span id="bjnick">BJ</span>님!</b>
+                <b><span id="bjnick">스트리머</span>님!</b>
                 <p id="sub-title"><b>몇분동안 민심을 파악하실건가요?</b></p>
             </div>
             <div style="text-align: center;">
-                <a data-time="1" class="add-time waves-effect waves-light btn-small cyan darken-1">+1분</a>
-                <a data-time="10" class="add-time waves-effect waves-light btn-small cyan darken-1">+10분</a>
-                <a data-time="30" class="add-time waves-effect waves-light btn-small cyan darken-1">+30분</a>
-                <a data-time="60" class="add-time waves-effect waves-light btn-small cyan darken-1">+1시간</a>
+                <a data-time="1" class="add-time waves-effect waves-light btn-small teal darken-3">+1분</a>
+                <a data-time="10" class="add-time waves-effect waves-light btn-small teal darken-3">+10분</a>
+                <a data-time="30" class="add-time waves-effect waves-light btn-small teal darken-3">+30분</a>
+                <a data-time="60" class="add-time waves-effect waves-light btn-small teal darken-3">+1시간</a>
             </div>
             <div class="input-field" style="text-align: center;">
                 <input type="number" id="timer" min="1" max="86400" style="width: 100px; text-align: center;">분<span id="trans-time" style="margin-left: 10px;color: darkturquoise;"></span>
             </div>
         </form>
         <div style="text-align: center;">
-            <button id="submit-btn" class="btn-large btn-floating waves-effect waves-light cyan darken-3" data-status="start">Start!</button>
+            <br>
+            <img id="submit-btn" src="img/start.png" alt="시작" data-status="start" style="cursor: pointer;"></img>                
         </div>
         <div style="text-align: center;">
             <span id="limit-time"></span>
         </div>
-        <a id="chatReset" style="float: right; display: none; background-color: #fcfcfc;" class="waves-effect waves-light btn-flat"><img src="./delete_icon.png" alt="delete"></a>
+        <a id="chatReset" style="float: right; display: none; background-color: #fcfcfc;" class="waves-effect waves-light btn-flat">
+            <img src="img/delete.png" alt="delete">
+        </a>
         <br>
         <div id="userGrade" style="text-align: center; display: none;">
-            <p><b>유저별로 상위 민심 키워드를 살펴보세요!</b></p>
+            <p><b>민심 판독 완료!!!</br>유저별로 상위 민심 키워드를 살펴보세요~</b></p>
             <form>
                 <label><input data-grade="all" name="ugroup" type="radio" checked/><span>전체</span></label>
                 <label><input data-grade="topfan" name="ugroup" type="radio"/><span>열혈팬</span></label>
@@ -125,7 +128,7 @@
         <br>
         <div style="text-align: center;">
             <div id="emptyResult" style="display: none;">
-                <img src="./noresult.png" alt="noresult" style="width:140px;height:120px;">
+                <img src="/img/empty.webp" alt="noresult" style="width:300px;height:200px;">
                 <p><b>민심이 없어요.. 그냥 없어요...</b></p>
             </div>
             <table id="resultTbl" style="display: none; text-align: center;"></table>
