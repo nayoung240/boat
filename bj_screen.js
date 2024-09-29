@@ -190,14 +190,14 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         e.target.dataset.status = 'stop';
-        e.target.src = 'img/replay.png';
+        e.target.src = './img/replay.png';
         document.getElementById('trans-time').innerText = '';
         candidateForm.style.display = 'none';
 
         const banners = ["banner2.webp", "banner3.webp", "banner4.webp", "banner5.webp", "banner6.webp", "banner7.webp"];
         const selectedBanner = banners[Math.floor(Math.random() * banners.length)];
 
-        bannerEl.src = '/img/' + selectedBanner;
+        bannerEl.src = './img/' + selectedBanner;
         bannerEl.style.display = 'none';
 
         M.toast({html: '시작합니다!'})
